@@ -12,6 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringArrayResource
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +36,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun JokeScreen() {
+// 1. Pobieramy tablicę zasobów
+    val jokes = stringArrayResource(R.array.jokes)
+
+    // 2. Stan przechowujący aktualnie wyświetlany żart (losujemy pierwszy na start)
+    var currentJoke by rememberSaveable { mutableStateOf(jokes.random()) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,14 +49,12 @@ fun JokeScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // 1. Tytuł z zasobów XML
         Text(
             text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(top = 16.dp)
         )
 
-        // 2. Karta z przykładowym żartem
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -53,16 +62,18 @@ fun JokeScreen() {
             )
         ) {
             Text(
-                text = stringResource(R.string.sample_joke),
+                text = currentJoke, // Wyświetlamy wylosowany żart
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(24.dp)
             )
         }
 
-        // 3. Okrągły przycisk głównej akcji (Shape = CircleShape)
         Button(
-            onClick = { /* Na razie puste */ },
+            onClick = {
+                // 3. Po kliknięciu losujemy nowy żart z tablicy
+                currentJoke = jokes.random()
+            },
             shape = CircleShape,
             modifier = Modifier.size(140.dp)
         ) {
@@ -72,7 +83,6 @@ fun JokeScreen() {
             )
         }
 
-        // 4. Tekst z dwoma parametrami dynamicznymi (%1$s oraz %2$d)
         Text(
             text = stringResource(R.string.greeting_user, "gościu", 5),
             style = MaterialTheme.typography.bodyMedium,

@@ -17,6 +17,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.pluralStringResource
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,11 +38,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun JokeScreen() {
-// 1. Pobieramy tablicę zasobów
     val jokes = stringArrayResource(R.array.jokes)
-
-    // 2. Stan przechowujący aktualnie wyświetlany żart (losujemy pierwszy na start)
     var currentJoke by rememberSaveable { mutableStateOf(jokes.random()) }
+
+    // 1. Stan licznika kliknięć
+    var jokeCount by rememberSaveable { mutableStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -62,7 +64,7 @@ fun JokeScreen() {
             )
         ) {
             Text(
-                text = currentJoke, // Wyświetlamy wylosowany żart
+                text = currentJoke,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(24.dp)
@@ -71,8 +73,8 @@ fun JokeScreen() {
 
         Button(
             onClick = {
-                // 3. Po kliknięciu losujemy nowy żart z tablicy
                 currentJoke = jokes.random()
+                jokeCount++ // 2. Zwiększamy licznik przy każdym kliknięciu
             },
             shape = CircleShape,
             modifier = Modifier.size(140.dp)
@@ -83,8 +85,10 @@ fun JokeScreen() {
             )
         }
 
+        // 3. Pobranie odpowiedniej formy z plurals
+        // UWAGA: Liczbę przekazujemy DWA RAZY (raz dla formy, raz jako wartość %1$d)
         Text(
-            text = stringResource(R.string.greeting_user, "gościu", 5),
+            text = pluralStringResource(R.plurals.jokes_count, jokeCount, jokeCount),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.outline,
             modifier = Modifier.padding(bottom = 16.dp)

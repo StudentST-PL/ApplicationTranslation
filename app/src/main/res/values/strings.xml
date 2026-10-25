@@ -9,6 +9,11 @@
         <item>There are 10 types of people in the world: those who understand binary, and those who don\'t.</item>
         <item>Why do programmers prefer dark mode? Because light attracts bugs.</item>
     </string-array>
+
+    <plurals name="jokes_count">
+        <item quantity="one">%1$d joke seen so far</item>
+        <item quantity="other">%1$d jokes seen so far</item>
+    </plurals>
 </resources>
 
 

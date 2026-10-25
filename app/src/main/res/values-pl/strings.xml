@@ -10,4 +10,10 @@
         <item>Na świecie jest 10 rodzajów ludzi: ci, którzy rozumieją system binarny, i ci, którzy go nie rozumieją.</item>
         <item>Dlaczego programiści wolą ciemny motyw? Bo światło przyciąga robaki.</item>
     </string-array>
+
+    <plurals name="jokes_count">
+        <item quantity="one">Obejrzano %1$d żart</item>
+        <item quantity="few">Obejrzano %1$d żarty</item>
+        <item quantity="many">Obejrzano %1$d żartów</item>
+    </plurals>
 </resources>

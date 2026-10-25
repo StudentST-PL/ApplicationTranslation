@@ -25,6 +25,10 @@ android {
                 enable = false
             }
         }
+
+        debug {
+            isPseudoLocalesEnabled = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

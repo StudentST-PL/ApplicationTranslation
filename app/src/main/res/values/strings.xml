@@ -14,6 +14,10 @@
         <item quantity="one">%1$d joke seen so far</item>
         <item quantity="other">%1$d jokes seen so far</item>
     </plurals>
+
+    <string name="lang_system">System</string>
+    <string name="lang_pl">Polski</string>
+    <string name="lang_en">English</string>
 </resources>
 
 

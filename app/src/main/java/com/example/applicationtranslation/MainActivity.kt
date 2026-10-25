@@ -13,12 +13,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.pluralStringResource
-
+import android.app.LocaleManager
+import android.content.Context
+import android.os.Build
+import android.os.LocaleList
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import androidx.compose.ui.platform.LocalContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,13 +42,31 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// Funkcja pomocnicza do zmiany języka aplikacji
+fun setAppLanguage(context: Context, languageTag: String) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val localeManager = context.getSystemService(LocaleManager::class.java)
+        localeManager?.applicationLocales = if (languageTag.isEmpty()) {
+            LocaleList.getEmptyLocaleList() // Ustawienie systemowe
+        } else {
+            LocaleList.forLanguageTags(languageTag)
+        }
+    } else {
+        AppCompatDelegate.setApplicationLocales(
+            if (languageTag.isEmpty()) LocaleListCompat.getEmptyLocaleList()
+            else LocaleListCompat.forLanguageTags(languageTag)
+        )
+    }
+}
+
 @Composable
 fun JokeScreen() {
+    val context = LocalContext.current
     val jokes = stringArrayResource(R.array.jokes)
-    var currentJoke by rememberSaveable { mutableStateOf(jokes.random()) }
+    var currentJokeIndex by rememberSaveable { mutableIntStateOf(0) }
+    var jokeCount by rememberSaveable { mutableIntStateOf(0) }
 
-    // 1. Stan licznika kliknięć
-    var jokeCount by rememberSaveable { mutableStateOf(0) }
+    val currentJoke = jokes.getOrElse(currentJokeIndex) { jokes.random() }
 
     Column(
         modifier = Modifier
@@ -51,10 +75,25 @@ fun JokeScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
+        // 1. Pasek przełączania języka na samej górze
+        Row(
+            modifier = Modifier.padding(top = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedButton(onClick = { setAppLanguage(context, "") }) {
+                Text(stringResource(R.string.lang_system))
+            }
+            OutlinedButton(onClick = { setAppLanguage(context, "pl") }) {
+                Text(stringResource(R.string.lang_pl))
+            }
+            OutlinedButton(onClick = { setAppLanguage(context, "en") }) {
+                Text(stringResource(R.string.lang_en))
+            }
+        }
+
         Text(
             text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(top = 16.dp)
+            style = MaterialTheme.typography.headlineMedium
         )
 
         Card(
@@ -73,8 +112,8 @@ fun JokeScreen() {
 
         Button(
             onClick = {
-                currentJoke = jokes.random()
-                jokeCount++ // 2. Zwiększamy licznik przy każdym kliknięciu
+                currentJokeIndex = (0 until jokes.size).random()
+                jokeCount++
             },
             shape = CircleShape,
             modifier = Modifier.size(140.dp)
@@ -85,8 +124,6 @@ fun JokeScreen() {
             )
         }
 
-        // 3. Pobranie odpowiedniej formy z plurals
-        // UWAGA: Liczbę przekazujemy DWA RAZY (raz dla formy, raz jako wartość %1$d)
         Text(
             text = pluralStringResource(R.plurals.jokes_count, jokeCount, jokeCount),
             style = MaterialTheme.typography.bodyMedium,
